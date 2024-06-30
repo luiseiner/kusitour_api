@@ -6,9 +6,16 @@ const multer = require('multer');
 const path = require('path');
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Obtener todos los restaurantes
+// Obtener todos los restaurantes o solo los que son publicidad
 router.get('/', (req, res) => {
-    db.query('SELECT * FROM restaurantes', (err, results) => {
+    let sqlQuery = 'SELECT * FROM restaurantes';
+    const queryParams = [];
+
+    if (req.query.publicidad === '1') {
+        sqlQuery += ' WHERE es_publicidad = 1';
+    }
+
+    db.query(sqlQuery, queryParams, (err, results) => {
         if (err) {
             console.error('Error fetching restaurants: ', err);
             return res.status(500).send(err);
